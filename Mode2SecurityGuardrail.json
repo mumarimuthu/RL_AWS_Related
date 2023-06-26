@@ -1,0 +1,178 @@
+{
+    "Statement": [
+        {
+            "Action": [
+                "savingsplans:*",
+                "iam:CreateUser",
+                "cur:*",
+                "ce:*",
+                "aws-portal:*",
+                "account:*"
+            ],
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyAccessToCostAndBillingandUserCreate"
+        },
+        {
+            "Action": [
+                "iam:SetDefaultPolicyVersion",
+                "iam:DeletePolicyVersion",
+                "iam:DeletePolicy",
+                "iam:CreatePolicyVersion"
+            ],
+            "Effect": "Deny",
+            "Resource": "arn:aws:iam::058077912663:policy/Mode2SecurityGuardrail",
+            "Sid": "DenyPermBoundaryIAMPolicyAlteration"
+        },
+        {
+            "Action": [
+                "iam:DeleteUserPermissionsBoundary",
+                "iam:DeleteRolePermissionsBoundary"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::058077912663:policy/Mode2SecurityGuardrail"
+                }
+            },
+            "Effect": "Deny",
+            "Resource": [
+                "arn:aws:iam::058077912663:user/*",
+                "arn:aws:iam::058077912663:role/*"
+            ],
+            "Sid": "DenyRemovalOfPermBoundaryFromAnyUserOrRole"
+        },
+        {
+            "Action": [
+                "iam:PutUserPermissionsBoundary",
+                "iam:PutRolePermissionsBoundary"
+            ],
+            "Condition": {
+                "StringNotEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::058077912663:policy/Mode2SecurityGuardrail"
+                }
+            },
+            "Effect": "Deny",
+            "Resource": [
+                "arn:aws:iam::058077912663:user/*",
+                "arn:aws:iam::058077912663:role/*"
+            ],
+            "Sid": "DenyAccessIfRequiredPermBoundaryIsNotBeingApplied"
+        },
+        {
+            "Action": "iam:CreateRole",
+            "Condition": {
+                "StringNotEquals": {
+                    "iam:PermissionsBoundary": "arn:aws:iam::058077912663:policy/Mode2SecurityGuardrail"
+                }
+            },
+            "Effect": "Deny",
+            "Resource": [
+                "arn:aws:iam::058077912663:user/*",
+                "arn:aws:iam::058077912663:role/*"
+            ],
+            "Sid": "DenyRoleCreationWithOutPermBoundary"
+        },
+        {
+            "Action": "iam:PassRole",
+            "Effect": "Deny",
+            "Resource": "arn:aws:iam::058077912663:user/*",
+            "Sid": "DenyIAMActions"
+        },
+        {
+            "Action": "ec2:CreateVolume",
+            "Condition": {
+                "Bool": {
+                    "ec2:Encrypted": "false"
+                }
+            },
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyEBSNotEncrypted"
+        },
+        {
+            "Action": "elasticfilesystem:CreateFileSystem",
+            "Condition": {
+                "Bool": {
+                    "elasticfilesystem:Encrypted": "false"
+                }
+            },
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyEFSNotEncrypted"
+        },
+        {
+            "Action": "directconnect:*",
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyDXActions"
+        },
+        {
+            "Action": "iam:CreateOpenIDConnectProvider",
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyOIDCIDPCreation"
+        },
+        {
+            "Action": "iam:CreateSAMLProvider",
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenySAMLIDPCreation"
+        },
+        {
+            "Action": "iam:CreateAccessKey",
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyIAMKey"
+        },
+        {
+            "Action": [
+                "ec2:CreateVpcPeeringConnection",
+                "ec2:AcceptVpcPeeringConnection"
+            ],
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyPeeringModifications"
+        },
+        {
+            "Action": "ec2:CreateInternetGateway",
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyCreateIGW"
+        },
+        {
+            "Action": [
+                "ec2:ModifyVpnConnection",
+                "ec2:ModifyVpcAttribute",
+                "ec2:ModifyTransitGatewayVpcAttachment",
+                "ec2:ModifyTransitGateway",
+                "ec2:ModifySubnetAttribute",
+                "ec2:CreateVpnConnection",
+                "ec2:CreateVpc",
+                "ec2:CreateTransitGatewayRouteTable",
+                "ec2:CreateTransitGatewayPeeringAttachment",
+                "ec2:CreateTransitGatewayConnectPeer",
+                "ec2:CreateSubnet",
+                "ec2:CreateRouteTable",
+                "ec2:CreateRoute",
+                "ec2:CreateNatGateway",
+                "ec2:CreateLocalGatewayRouteTableVpcAssociation",
+                "ec2:CreateLocalGatewayRouteTableVirtualInterfaceGroupAssociation",
+                "ec2:CreateLocalGatewayRouteTable",
+                "ec2:CreateLocalGatewayRoute",
+                "ec2:AcceptTransitGatewayVpcAttachment",
+                "ec2:AcceptTransitGatewayPeeringAttachment",
+                "ec2:AcceptTransitGatewayMulticastDomainAssociations"
+            ],
+            "Effect": "Deny",
+            "Resource": "*",
+            "Sid": "DenyRouteTableorSubnetModifications"
+        },
+        {
+            "Action": "*",
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "AllowNotDenied"
+        }
+    ],
+    "Version": "2012-10-17"
+}
